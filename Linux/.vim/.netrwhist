@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/usr/share/vim/vim80/colors'
+let g:netrw_dirhist_2='/home/carno/.vim/colors'
+let g:netrw_dirhist_3='/home/carno/.oh-my-zsh'
+let g:netrw_dirhist_4='/mnt/d/OneDrive - mails.ucas.edu.cn/6th Term/Bioinformatics/Notes'
+let g:netrw_dirhist_5='/mnt/d/Codes/Bioinformatics/BioTree/ChIP-seq'
+let g:netrw_dirhist_6='/mnt/d/Codes/Bioinformatics/BioTree'
+let g:netrw_dirhist_7='/home/carno/.java'
+let g:netrw_dirhist_8='/mnt/d/Codes/Bioinformatics/Cookbook/Chapter2/__pycache__'

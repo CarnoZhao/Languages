@@ -51,6 +51,7 @@ let g:ycm_max_num_identifier_candidates=7
 let g:ycm_complete_in_comments=1
 let g:ycm_complete_in_strings=1
 let g:ycm_collect_identifiers_from_comments_and_strings=1
+let g:ycm_path_to_python_interpreter='/usr/bin/python'
 inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 map <leader> g:YcmCompleter GoToDefinitionElseDeclaration<CR>
 
@@ -87,11 +88,13 @@ map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
 		exec "w"
 		if &filetype == 'python'
-				exec "!echo /*---------------------------------*/ && echo /*---------------------------------*/ && time python3 %"
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time /mnt/d/Applications/Anaconda_Linux/bin/python %"
 		elseif &filetype == 'R'
-				exec "!echo /*---------------------------------*/ && echo /*---------------------------------*/ && time cmd.exe /c Rscript.exe %"
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time cmd.exe /c Rscript.exe %"
 		elseif &filetype == 'tex'
-				exec "!echo /*---------------------------------*/ && echo /*---------------------------------*/ && time bash /usr/bin/texpdf.sh %"
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time bash /usr/bin/texpdf.sh %"
+		elseif &filetype == 'rmd'
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time Rscript -e \"rmarkdown::render('%')\""
 		endif
 endfunct
 
