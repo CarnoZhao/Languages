@@ -4,6 +4,7 @@ colorscheme onedark
 
 set nocompatible
 set nofoldenable
+set shortmess=atI
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -13,8 +14,19 @@ Plugin 'thinca/vim-quickrun'
 Plugin 'Raimondi/delimitMate'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
+Plugin 'vim-pandoc/vim-rmarkdown'
+Plugin 'vim-pandoc/vim-pandoc'
+Plugin 'vim-pandoc/vim-pandoc-syntax'
+"Plugin 'Lokaltog/vim-powerline'
 call vundle#end()
 filetype plugin indent on
+
+"let g:Powerline_symbols='fancy'
+"set encoding=utf-8
+"set laststatus=2
+
+let g:pandoc#syntax#conceal#use=0
+let g:pandoc#spell#enabled=0
 
 let g:vim_markdown_math=1
 let g:vim_markdown_folding_disabled=1
@@ -56,6 +68,7 @@ inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
 map <leader> g:YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 set tabstop=4
+set expandtab
 set nu
 set ic
 set mouse=a
@@ -90,10 +103,10 @@ func! CompileRunGcc()
 		if &filetype == 'python'
 				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time /mnt/d/Applications/Anaconda_Linux/bin/python %"
 		elseif &filetype == 'R'
-				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time cmd.exe /c Rscript.exe %"
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time /mnt/d/Applications/Anaconda_Linux/bin/R %"
 		elseif &filetype == 'tex'
-				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time bash /usr/bin/texpdf.sh %"
-		elseif &filetype == 'rmd'
+				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time pdflatex %"
+		elseif &filetype == 'rmarkdown'
 				exec "!echo \"/*---------------------------------*/\" && echo \"/*---------------------------------*/\" && time Rscript -e \"rmarkdown::render('%')\""
 		endif
 endfunct

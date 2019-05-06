@@ -108,6 +108,7 @@ alias t='tree -h'
 # alias mounte='sudo mount -t drvfs e: /mnt/e'
 alias h='history'
 alias pip='/mnt/d/Applications/Anaconda_Linux/bin/pip'
+alias see='/mnt/d/Codes/OtherFiles/see.sh $@'
 life(){
 		echo "scale=2; `paste /sys/class/power_supply/BAT0/energy_now /sys/class/power_supply/BAT0/power_now -d '/'`" | bc | awk -F '.' '{print $1"h"int($2*0.6)"min"}'
 }
@@ -119,12 +120,12 @@ cd ~
 #if [ $? -eq 0 ]; then
 #    \eval "$__conda_setup"
 #else
-    if [ -f "/mnt/d/Applications/Anaconda_Linux/etc/profile.d/conda.sh" ]; then
-        . "/mnt/d/Applications/Anaconda_Linux/etc/profile.d/conda.sh"
+#    if [ -f "/mnt/d/Applications/Anaconda_Linux/etc/profile.d/conda.sh" ]; then
+#        . "/mnt/d/Applications/Anaconda_Linux/etc/profile.d/conda.sh"
 #        CONDA_CHANGEPS1=false conda activate base
-    else
+#    else
         \export PATH="/mnt/d/Applications/Anaconda_Linux/bin:$PATH"
-    fi
+#    fi
 #fi
 unset __conda_setup
 unsetopt BG_NICE
@@ -134,4 +135,4 @@ LS_COLORS="rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:c
 export LS_COLORS
 eval $(dircolors -b $HOME/.dircolors)
 export LANG=en_US.UTF-8
-
+export PATH="/home/carno/.TinyTeX/bin/x86_64-linux:$PATH"
