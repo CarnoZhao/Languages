@@ -7,6 +7,8 @@ elif [ $suffix == pdf ]; then
         evince $name &>/dev/null
 elif echo "${pics[@]}" | grep -w $suffix &>/dev/null ; then
         deepin-image-viewer $name &>/dev/null &
+elif [ $suffix == csv ] || [ $2 == csv ]; then
+        column -s, -t < $name | less -#2 -N -S
 else
         echo "File Type Not Supported"
         echo "See /mnt/d/Codes/OtherFiles/see.sh"
