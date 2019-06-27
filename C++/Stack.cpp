@@ -16,7 +16,18 @@ public:
 	}
 
 	~Stack(){
-		clear();
+		delete [] aList;
 	}
 	
+	void clear(){
+		
+	}
+
+	bool push(const T item);
+
+	bool top(T& item);
+
+	bool pop(T& item);
+
+	bool isEmpty();
 };
