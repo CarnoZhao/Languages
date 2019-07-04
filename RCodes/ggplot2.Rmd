@@ -1,0 +1,132 @@
+# **ggplot2**
+
+## Definitions
+- geom: geometric object
+- stats: statistical transformation
+- aes: easthetic attributes
+- coord: coordinate system
+- facet
+
+```{r, "include" = FALSE}
+library(ggplot2)
+```
+
+## Introduction to `ggplot2`: `qplot`
+
+```{r}
+data(diamonds); set.seed(1410)
+d = diamonds[sample(nrow(diamonds), 100),]
+print(paste(colnames(d), collapse = " "))
+```
+
+```{r}
+qplot(log(carat), log(price), 
+	data = d, color = color, 
+	shape = cut, size = I(3), 
+	alpha = I(0.7))
+```
+
+
+### Geom Objects
+- point, smooth, boxplot, path, line, histogram, freqploy, density, bar
+
+
+### smooth
+```{r}
+ggplot(d, aes(x = log(carat), y = log(price))) +
+	geom_point() + 
+	geom_smooth(
+		se = TRUE, # standard error
+		method = "loess", # default for small data size
+		# "lm": linear, formula = y ~ poly(x, 2), polynomial
+		# "rlm": insensitive to strange data point
+		span = 0.7 # larger span, smoother line
+		)
+```
+
+### jitter & boxplot
+```{r}
+ggplot(d, aes(x = color, y = price / carat)) + 
+	geom_jitter(alpha = I(0.5)) # available: size, color, shape
+ggplot(d, aes(x = color, y = price / carat)) + 
+	geom_boxplot() # available: fill, size
+``` 
+
+### histogram & density
+```{r}
+ggplot(d, aes(x = carat)) + 
+	geom_histogram(
+		bins = 20, # number of bins, or using `binwidth`
+		) +
+	xlim(c(0, 3))
+ggplot(d, aes(x = carat)) + 
+	geom_density(aes(
+		color = color, 
+		fill = color, 
+		alpha = I(0.7))) + 
+	xlim(c(0, 3))
+```
+
+### bar
+```{r}
+ggplot(d, aes(x = color)) + 
+	geom_bar(aes(
+		weight = carat, # weighted by color
+		color = color,
+		fill = color))
+```
+
+### line & path
+```{r}
+data(economics); d = economics
+ggplot(d, aes(x = date, y = unemploy / pop)) + geom_line()
+year = function(x) as.POSIXlt(x)$year + 1900
+ggplot(d, aes(x = unemploy / pop, y = uempmed, color = year(date))) + geom_path()
+```
+
+## Build Graph with Layers
+
+### Data
+
+- Change Data using `%+%` ...
+
+```{r}
+data(mtcars); d = mtcars
+graph = ggplot(d, aes(x = mpg, y = wt, color = cyl)) + geom_point()
+d$mpg = d$mpg ^ 2
+graph %+% d
+```
+
+- or ...
+
+```{r}
+d = mtcars; graph = ggplot(d, aes(x = mpg, y = wt, colot = cyl)) + geom_point()
+graph + geom_point(aes(x = mpg ^ 2))
+```
+
+- Grouped data
+
+```{r}
+library(nlme)
+data(Oxboys); d = Oxboys
+ggplot(d, aes(x = age, y = height)) + 
+	geom_line(aes(color = Subject, group = Subject)) + 
+	geom_smooth(aes(method = 'lm', group = 1), size = 2, se = FALSE, color = 'red')
+```
+
+### Statistical Change
+
+- density
+
+```{r}
+d = diamonds[sample(nrow(diamonds), 100),]
+ggplot(d, aes(carat)) + geom_histogram(aes(y = ..density..), binwidth = 0.1)
+```
+
+### Position Change
+
+- dodge: side by side
+- fill: normalize to 1
+- identity: no change
+- jitter
+- stack
