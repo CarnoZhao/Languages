@@ -3,7 +3,7 @@
 ## Definitions
 - geom: geometric object
 - stats: statistical transformation
-- aes: easthetic attributes
+- aes: aesthetic attributes
 - coord: coordinate system
 - facet
 
@@ -19,7 +19,7 @@ d = diamonds[sample(nrow(diamonds), 100),]
 print(paste(colnames(d), collapse = " "))
 ```
 
-```{r}
+```{}
 qplot(log(carat), log(price), 
 	data = d, color = color, 
 	shape = cut, size = I(3), 
@@ -32,7 +32,7 @@ qplot(log(carat), log(price),
 
 
 ### smooth
-```{r}
+```{}
 ggplot(d, aes(x = log(carat), y = log(price))) +
 	geom_point() + 
 	geom_smooth(
@@ -45,7 +45,7 @@ ggplot(d, aes(x = log(carat), y = log(price))) +
 ```
 
 ### jitter & boxplot
-```{r}
+```{}
 ggplot(d, aes(x = color, y = price / carat)) + 
 	geom_jitter(alpha = I(0.5)) # available: size, color, shape
 ggplot(d, aes(x = color, y = price / carat)) + 
@@ -53,7 +53,7 @@ ggplot(d, aes(x = color, y = price / carat)) +
 ``` 
 
 ### histogram & density
-```{r}
+```{}
 ggplot(d, aes(x = carat)) + 
 	geom_histogram(
 		bins = 20, # number of bins, or using `binwidth`
@@ -68,7 +68,7 @@ ggplot(d, aes(x = carat)) +
 ```
 
 ### bar
-```{r}
+```{}
 ggplot(d, aes(x = color)) + 
 	geom_bar(aes(
 		weight = carat, # weighted by color
@@ -77,20 +77,61 @@ ggplot(d, aes(x = color)) +
 ```
 
 ### line & path
-```{r}
+```{}
 data(economics); d = economics
 ggplot(d, aes(x = date, y = unemploy / pop)) + geom_line()
 year = function(x) as.POSIXlt(x)$year + 1900
 ggplot(d, aes(x = unemploy / pop, y = uempmed, color = year(date))) + geom_path()
 ```
 
+## `ggplot2` Grammar Components
+
+### Layer
+
+A layer consists of:
+- Data and attributes mapping
+- A statistical change
+- A geometric object
+- A position change
+
+### Scale
+
+Scale controls the mapping from data to aesthetic attributes. A scale is a function with some parameters.
+
+- Size, shape, color ...
+
+### Coordinate System
+
+Scale change happens before statistical change, while coordinate change is after statistical change.
+
+- Cartesian, semi-log, polar ...
+
+### Data Structure
+
+A graph object consists of data, mapping (default attributes mapping), layer, scale, coordinate system and facets.
+
 ## Build Graph with Layers
 
-### Data
+### Create a Graph Object
+
+```{}
+graph = ggplot(d, aes(x = carat, y = price, color = cut))
+graph
+```
+
+### Add Layer
+
+Add `geom_...(aes, data, ..., stat, position)`
+```{}
+graph = graph + geom_point()
+graph
+```
+
+### Data Manipulation
 
 - Change Data using `%+%` ...
 
-```{r}
+```{}
 data(mtcars); d = mtcars
 graph = ggplot(d, aes(x = mpg, y = wt, color = cyl)) + geom_point()
 d$mpg = d$mpg ^ 2
@@ -99,14 +140,17 @@ graph %+% d
 
 - or ...
 
-```{r}
+```{}
 d = mtcars; graph = ggplot(d, aes(x = mpg, y = wt, colot = cyl)) + geom_point()
 graph + geom_point(aes(x = mpg ^ 2))
 ```
 
+- Remove data
+`aes(x = NULL)`
+
 - Grouped data
 
-```{r}
+```{}
 library(nlme)
 data(Oxboys); d = Oxboys
 ggplot(d, aes(x = age, y = height)) + 
@@ -118,7 +162,7 @@ ggplot(d, aes(x = age, y = height)) +
 
 - density
 
-```{r}
+```{}
 d = diamonds[sample(nrow(diamonds), 100),]
 ggplot(d, aes(carat)) + geom_histogram(aes(y = ..density..), binwidth = 0.1)
 ```
@@ -130,3 +174,10 @@ ggplot(d, aes(carat)) + geom_histogram(aes(y = ..density..), binwidth = 0.1)
 - identity: no change
 - jitter
 - stack
+
+```{r}
+graph = ggplot(d, aes(x = color, group = cut, color = cut, fill = cut))
+graph + geom_bar(position = "dodge")
+graph + geom_bar(position = "fill")
+graph + geom_bar(position = "stack")
+```
