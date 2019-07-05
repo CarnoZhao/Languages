@@ -9,6 +9,26 @@
 
 ```{r, "include" = FALSE}
 library(ggplot2)
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  if (is.null(layout)) {
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+ if (numPlots==1) {
+    print(plots[[1]])
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
 ```
 
 ## Introduction to `ggplot2`: `qplot`
@@ -19,7 +39,7 @@ d = diamonds[sample(nrow(diamonds), 100),]
 print(paste(colnames(d), collapse = " "))
 ```
 
-```{}
+```{r}
 qplot(log(carat), log(price), 
 	data = d, color = color, 
 	shape = cut, size = I(3), 
@@ -32,7 +52,7 @@ qplot(log(carat), log(price),
 
 
 ### smooth
-```{}
+```{r}
 ggplot(d, aes(x = log(carat), y = log(price))) +
 	geom_point() + 
 	geom_smooth(
@@ -45,7 +65,7 @@ ggplot(d, aes(x = log(carat), y = log(price))) +
 ```
 
 ### jitter & boxplot
-```{}
+```{r}
 ggplot(d, aes(x = color, y = price / carat)) + 
 	geom_jitter(alpha = I(0.5)) # available: size, color, shape
 ggplot(d, aes(x = color, y = price / carat)) + 
@@ -53,7 +73,7 @@ ggplot(d, aes(x = color, y = price / carat)) +
 ``` 
 
 ### histogram & density
-```{}
+```{r}
 ggplot(d, aes(x = carat)) + 
 	geom_histogram(
 		bins = 20, # number of bins, or using `binwidth`
@@ -68,7 +88,7 @@ ggplot(d, aes(x = carat)) +
 ```
 
 ### bar
-```{}
+```{r}
 ggplot(d, aes(x = color)) + 
 	geom_bar(aes(
 		weight = carat, # weighted by color
@@ -77,7 +97,7 @@ ggplot(d, aes(x = color)) +
 ```
 
 ### line & path
-```{}
+```{r}
 data(economics); d = economics
 ggplot(d, aes(x = date, y = unemploy / pop)) + geom_line()
 year = function(x) as.POSIXlt(x)$year + 1900
@@ -114,7 +134,8 @@ A graph object consists of data, mapping (default attributes mapping), layer, sc
 
 ### Create a Graph Object
 
-```{}
+```{r}
+d = diamonds[sample(nrow(diamonds), 100),]
 graph = ggplot(d, aes(x = carat, y = price, color = cut))
 graph
 ```
@@ -122,7 +143,7 @@ graph
 ### Add Layer
 
 Add `geom_...(aes, data, ..., stat, position)`
-```{}
+```{r}
 graph = graph + geom_point()
 graph
 ```
@@ -131,7 +152,7 @@ graph
 
 - Change Data using `%+%` ...
 
-```{}
+```{r}
 data(mtcars); d = mtcars
 graph = ggplot(d, aes(x = mpg, y = wt, color = cyl)) + geom_point()
 d$mpg = d$mpg ^ 2
@@ -140,7 +161,7 @@ graph %+% d
 
 - or ...
 
-```{}
+```{r}
 d = mtcars; graph = ggplot(d, aes(x = mpg, y = wt, colot = cyl)) + geom_point()
 graph + geom_point(aes(x = mpg ^ 2))
 ```
@@ -150,7 +171,7 @@ graph + geom_point(aes(x = mpg ^ 2))
 
 - Grouped data
 
-```{}
+```{r}
 library(nlme)
 data(Oxboys); d = Oxboys
 ggplot(d, aes(x = age, y = height)) + 
@@ -162,7 +183,7 @@ ggplot(d, aes(x = age, y = height)) +
 
 - density
 
-```{}
+```{r}
 d = diamonds[sample(nrow(diamonds), 100),]
 ggplot(d, aes(carat)) + geom_histogram(aes(y = ..density..), binwidth = 0.1)
 ```
@@ -177,7 +198,41 @@ ggplot(d, aes(carat)) + geom_histogram(aes(y = ..density..), binwidth = 0.1)
 
 ```{r}
 graph = ggplot(d, aes(x = color, group = cut, color = cut, fill = cut))
-graph + geom_bar(position = "dodge")
-graph + geom_bar(position = "fill")
-graph + geom_bar(position = "stack")
+g1 = graph + geom_bar(position = "dodge")
+g2 = graph + geom_bar(position = "fill")
+g3 = graph + geom_bar(position = "stack")
+multiplot(g1, g2, g3, cols = 2)
+```
+
+## Practice
+
+### Basic Graphic Type
+
+```{r}
+d = data.frame(x = c(3, 1, 5), y = c(2, 4, 6), label = LETTERS[1:3])
+graph = ggplot(d, aes(x = x, y = y)) + xlab(NULL) + ylab(NULL)
+g1 = graph + geom_point() + ggtitle('Point')
+g2 = graph + geom_bar(stat = 'identity') + ggtitle('Bar')
+g3 = graph + geom_line() + ggtitle('Line')
+g4 = graph + geom_area() + ggtitle('Area')
+g5 = graph + geom_path() + ggtitle('Path')
+g6 = graph + geom_text(aes(label = label)) + ggtitle('Text')
+g7 = graph + geom_tile() + ggtitle('Tile')
+g8 = graph + geom_polygon() + ggtitle('Polygon')
+multiplot(g1, g2, g3, g4, g5, g6, g7, g8, cols = 4)
+```
+
+## Scale, Axis and Legend
+
+### Scale
+
+```{r}
+data(msleep); d = msleep
+graph = ggplot(d, aes(x = sleep_total, y = sleep_cycle, color = vore)) + geom_point()
+g2 = graph + scale_color_hue()
+g3 = graph + scale_color_hue("Eat?", 
+	breaks = c("herbi", "carni", "omni", "NA"), 
+	labels = c("plants", "meat", "both", "don't know"))
+g4 = graph + scale_color_brewer(palette = "Set2") # color set
+multiplot(graph, g2, g3, g4, cols = 2)
 ```
