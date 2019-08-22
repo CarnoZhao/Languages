@@ -31,6 +31,3 @@ printa(round.(inv_A * A - E₄, digits = 1))
 println("AX = β, \n, then X = ")
 X = 
 printa(A \ β)
-
-
-asdasdasd
