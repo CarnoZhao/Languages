@@ -17,9 +17,9 @@ end
 println()
 
 strings = "1 + 1"
-println("1 + 1 = $(1 + 1)")
+println("1 + 1 = $(1 + 5)")
 
-α, β = 1, 2
+α, β = 1, 3
 println(α + β)
 
 function MySum(A)
@@ -33,7 +33,7 @@ end
 list = [1 2 3 4 5]
 println(MySum(list))
 
-x1 = rand(2, 2)
+x1 = rand(2, 2) .* 3
 show(x1)
 println(x1)
 println(x1 .+ 2)
