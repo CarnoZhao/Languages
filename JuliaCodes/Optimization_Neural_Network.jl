@@ -33,8 +33,9 @@ end
 
 function batch_data(X, Y, batch_size)
     m = size(X)[2]
-    shuffle_X = X[:, shuffle(1:m)]
-    shuffle_Y = Y[:, shuffle(1:m)]
+    new_order = shuffle(1:m)
+    shuffle_X = X[:, new_order]
+    shuffle_Y = Y[:, new_order]
     batches = []
     k = Int(floor(m // batch_size))
     for i in 1:k
@@ -67,10 +68,10 @@ function backward(Y, parameters, caches, V, S, beta1, beta2)
         dW = dZ * A_prev' / m
         db = mean(dZ, dims = 2)
         dA = W' * dZ
-        V[i][1] = beta1 * V[i][1] + (1 - beta1) * dW
-        V[i][2] = beta1 * V[i][2] + (1 - beta1) * db
-        S[i][1] = beta2 * S[i][1] + (1 - beta2) * dW .^ 2
-        S[i][2] = beta2 * S[i][2] + (1 - beta2) * db .^ 2
+        V[i][1] = (beta1 * V[i][1] + (1 - beta1) * dW) / (1 - beta1 ^ i)
+        V[i][2] = (beta1 * V[i][2] + (1 - beta1) * db) / (1 - beta1 ^ i)
+        S[i][1] = (beta2 * S[i][1] + (1 - beta2) * dW .^ 2) / (1 - beta2 ^ i)
+        S[i][2] = (beta2 * S[i][2] + (1 - beta2) * db .^ 2) / (1 - beta2 ^ i)
     end
     V, S
 end
