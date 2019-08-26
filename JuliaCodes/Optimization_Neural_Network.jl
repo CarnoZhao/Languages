@@ -92,11 +92,11 @@ end
 function predict(X, parameters)
     caches = forward(X, parameters)
     AL = caches[length(caches)]
-    num = argmax(AL)
+    num = reshape(argmax(AL, dims = 1), :, 1)
     num
 end
 
-function network(X, Y, layer_dims; num_iterations = 3000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
+function network(X, Y, layer_dims; num_iterations = 30000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
     parameters = random_initialization(layer_dims)
     V, S = moment_initialization(parameters)
     for i in 1:num_iterations
@@ -115,19 +115,21 @@ function network(X, Y, layer_dims; num_iterations = 3000, batch_size = 64, learn
     parameters
 end
 
-function main(train_x, train_y, test_x, test_y; train_size = 6000, test_size = 100, num_iterations = 3000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
+function main(train_x, train_y, test_x, test_y; train_size = 600, test_size = 100, num_iterations = 30000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
     train_x = reshape(train_x, :, size(train_x)[length(size(train_x))])[:, 1:train_size]
+    train_y_num = reshape(train_y[1:train_size], :, 1)
     train_y = [ifelse(i == y, 1, 0) for y in train_y for i in 0:9]
     train_y = reshape(train_y, 10, :)[:, 1:train_size]
     test_x = reshape(test_x, :, size(test_x)[length(size(test_x))])[:, 1:test_size]
+    test_y_num = reshape(test_y[1:test_size], :, 1)
     test_y = [ifelse(i == y, 1, 0) for y in test_y for i in 0:9]
     test_y = reshape(test_y, 10, :)[:, 1:test_size]
     layer_dims = [size(train_x)[1], 20, 15, size(train_y)[1]]
-    parameters = network(train_x, train_y, layer_dims)
+    parameters = network(train_x, train_y, layer_dims, num_iterations = num_iterations, batch_size = batch_size, learning_rate = learning_rate, beta1 = beta1, beta2 = beta2, epsilon = epsilon)
     pred_train_y = predict(train_x, parameters)
     pred_test_y = predict(test_x, parameters)
-    println("Train accuracy: $(round(mean(pred_train_y .== train_y) * 100, digits = 3))%")
-    println("Test accuracy: $(round(mean(pred_test_y .== test_y) * 100, digits = 3))%")
+    println("Train accuracy: $(round(mean(pred_train_y .== train_y_num) * 100, digits = 3))%")
+    println("Test accuracy: $(round(mean(pred_test_y .== test_y_num) * 100, digits = 3))%")
     parameters
 end
 
