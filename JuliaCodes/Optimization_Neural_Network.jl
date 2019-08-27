@@ -39,8 +39,8 @@ function batch_data(X, Y, batch_size)
     batches = []
     k = Int(floor(m // batch_size))
     for i in 1:k
-        mini_X = shuffle_X[:, ((i - 1) * batch_size + 1):ifelse(i == k && m % batch_size != 0, m, (i * batch_size))]
-        mini_Y = shuffle_Y[:, ((i - 1) * batch_size + 1):ifelse(i == k && m % batch_size != 0, m, (i * batch_size))]
+        mini_X = shuffle_X[:, ((i - 1) * batch_size + 1):min(m, i * batch_size)]
+        mini_Y = shuffle_Y[:, ((i - 1) * batch_size + 1):min(m, i * batch_size)]
         push!(batches, [mini_X, mini_Y])
     end
     batches
@@ -111,9 +111,7 @@ function network(X, Y, layer_dims; num_iterations = 30000, batch_size = 64, lear
         end
         if i % 100 == 0
             println("Cost after $(i) iterations: $(cost)")
-            # println("Cost after $(i) iterations: $(round(cost, digits = 4))")
         end
-        break
     end
     parameters
 end
