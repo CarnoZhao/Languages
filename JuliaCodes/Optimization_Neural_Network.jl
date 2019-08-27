@@ -1,4 +1,4 @@
-using MLDatasets, LinearAlgebra, Statistics, Images, PyPlot, Random
+using MLDatasets, LinearAlgebra, Statistics, Random
 
 train_x, train_y = MNIST.traindata(Float64)
 test_x, test_y = MNIST.testdata(Float64)
@@ -39,8 +39,8 @@ function batch_data(X, Y, batch_size)
     batches = []
     k = Int(floor(m // batch_size))
     for i in 1:k
-        mini_X = shuffle_X[:, ((k - 1) * batch_size + 1):ifelse(i == k, m, (k * batch_size))]
-        mini_Y = shuffle_Y[:, ((k - 1) * batch_size + 1):ifelse(i == k, m, (k * batch_size))]
+        mini_X = shuffle_X[:, ((i - 1) * batch_size + 1):ifelse(i == k && m % batch_size != 0, m, (i * batch_size))]
+        mini_Y = shuffle_Y[:, ((i - 1) * batch_size + 1):ifelse(i == k && m % batch_size != 0, m, (i * batch_size))]
         push!(batches, [mini_X, mini_Y])
     end
     batches
@@ -57,7 +57,7 @@ function forward(X, parameters)
     caches
 end
 
-function backward(Y, parameters, caches, V, S, beta1, beta2)
+function backward(Y, parameters, caches, V, S, beta1, beta2, t)
     L = length(parameters)
     m = size(Y)[2]
     AL = caches[length(caches)]
@@ -68,10 +68,10 @@ function backward(Y, parameters, caches, V, S, beta1, beta2)
         dW = dZ * A_prev' / m
         db = mean(dZ, dims = 2)
         dA = W' * dZ
-        V[i][1] = (beta1 * V[i][1] + (1 - beta1) * dW) / (1 - beta1 ^ i)
-        V[i][2] = (beta1 * V[i][2] + (1 - beta1) * db) / (1 - beta1 ^ i)
-        S[i][1] = (beta2 * S[i][1] + (1 - beta2) * dW .^ 2) / (1 - beta2 ^ i)
-        S[i][2] = (beta2 * S[i][2] + (1 - beta2) * db .^ 2) / (1 - beta2 ^ i)
+        V[i][1] = (beta1 * V[i][1] + (1 - beta1) * dW) / (1 - beta1 ^ t)
+        V[i][2] = (beta1 * V[i][2] + (1 - beta1) * db) / (1 - beta1 ^ t)
+        S[i][1] = (beta2 * S[i][1] + (1 - beta2) * dW .^ 2) / (1 - beta2 ^ t)
+        S[i][2] = (beta2 * S[i][2] + (1 - beta2) * db .^ 2) / (1 - beta2 ^ t)
     end
     V, S
 end
@@ -93,7 +93,7 @@ end
 function predict(X, parameters)
     caches = forward(X, parameters)
     AL = caches[length(caches)]
-    num = reshape(argmax(AL, dims = 1), :, 1)
+    num = reshape([index[1] - 1 for index in argmax(AL, dims = 1)], :, 1)
     num
 end
 
@@ -106,23 +106,25 @@ function network(X, Y, layer_dims; num_iterations = 30000, batch_size = 64, lear
         for (mini_X, mini_Y) in batches
             caches = forward(mini_X, parameters)
             cost += compute_cost(caches[length(caches)], mini_Y)
-            V, S = backward(mini_Y, parameters, caches, V, S, beta1, beta2)
+            V, S = backward(mini_Y, parameters, caches, V, S, beta1, beta2, i)
             parameters = update_parameters(V, S, epsilon, parameters, learning_rate)
         end
         if i % 100 == 0
-            println("Cost after $(i) iterations: $(round(cost, digits = 4))")
+            println("Cost after $(i) iterations: $(cost)")
+            # println("Cost after $(i) iterations: $(round(cost, digits = 4))")
         end
+        break
     end
     parameters
 end
 
-function main(train_x, train_y, test_x, test_y; train_size = 600, test_size = 100, num_iterations = 30000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
+function main(train_x, train_y, test_x, test_y; train_size = 60000, test_size = 10000, num_iterations = 30000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
     train_x = reshape(train_x, :, size(train_x)[length(size(train_x))])[:, 1:train_size]
-    train_y_num = reshape(train_y[1:train_size], :, 1)
+    train_y_num = train_y[1:train_size]
     train_y = [ifelse(i == y, 1, 0) for y in train_y for i in 0:9]
     train_y = reshape(train_y, 10, :)[:, 1:train_size]
     test_x = reshape(test_x, :, size(test_x)[length(size(test_x))])[:, 1:test_size]
-    test_y_num = reshape(test_y[1:test_size], :, 1)
+    test_y_num = test_y[1:test_size]
     test_y = [ifelse(i == y, 1, 0) for y in test_y for i in 0:9]
     test_y = reshape(test_y, 10, :)[:, 1:test_size]
     layer_dims = [size(train_x)[1], 20, 15, size(train_y)[1]]
@@ -134,4 +136,10 @@ function main(train_x, train_y, test_x, test_y; train_size = 600, test_size = 10
     parameters
 end
 
-parameters = main(train_x, train_y, test_x, test_y)      
+parameters = main(train_x, train_y, test_x, test_y, 
+    train_size = 60000, 
+    test_size = 10000, 
+    num_iterations = 30000, 
+    batch_size = 64,
+    learning_rate = 0.0075
+    );
