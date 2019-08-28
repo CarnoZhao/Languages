@@ -116,7 +116,7 @@ function network(X, Y, layer_dims; num_iterations = 30000, batch_size = 64, lear
     parameters
 end
 
-function main(train_x, train_y, test_x, test_y; train_size = 60000, test_size = 10000, num_iterations = 30000, batch_size = 64, learning_rate = 0.0075, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
+function main(train_x, train_y, test_x, test_y; train_size = 60000, test_size = 10000, num_iterations = 30000, batch_size = 64, learning_rate = 0.0007, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8)
     train_x = reshape(train_x, :, size(train_x)[length(size(train_x))])[:, 1:train_size]
     train_y_num = train_y[1:train_size]
     train_y = [ifelse(i == y, 1, 0) for y in train_y for i in 0:9]
@@ -134,10 +134,4 @@ function main(train_x, train_y, test_x, test_y; train_size = 60000, test_size = 
     parameters
 end
 
-parameters = main(train_x, train_y, test_x, test_y, 
-    train_size = 60000, 
-    test_size = 10000, 
-    num_iterations = 30000, 
-    batch_size = 64,
-    learning_rate = 0.0075
-    );
+parameters = main(train_x, train_y, test_x, test_y, train_size = 6000, test_size = 1000, num_iterations = 2000, batch_size = 512, learning_rate = 0.0007);
