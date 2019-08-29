@@ -1,13 +1,13 @@
-use_gpu = false
+use_gpu = true
 if use_gpu
     using CUDAdrv
     using CUDAnative
     using CuArrays
     cu = CuArrays.CuArray
-    expfunc = CUDAnative.exp
+    expfunc(x) = CUDAnative.exp(x)
 else
     cu = Array
-    expfunc = exp
+    expfunc(x) = exp(x)
 end
 using MLDatasets, LinearAlgebra, Statistics, Random
 train_x, train_y = MLDatasets.MNIST.traindata(Float64)
@@ -156,4 +156,4 @@ function main(train_x, train_y, test_x, test_y; train_size = 60000, test_size = 
     parameters
 end
 
-parameters = main(train_x, train_y, test_x, test_y, train_size = 2000, test_size = 600, num_iterations = 1000, learning_rate = 0.0007, beta1 = 0.9, beta2 = 0.99999, epsilon = 1e-8, batch_size = 256);
+parameters = main(train_x, train_y, test_x, test_y, train_size = 60000, test_size = 10000, num_iterations = 2000, learning_rate = 0.0007, beta1 = 0.9, beta2 = 0.99999, epsilon = 1e-8, batch_size = 0);
